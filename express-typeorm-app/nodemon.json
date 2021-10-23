@@ -1,0 +1,11 @@
+{
+  "verbose": true,
+  "watch": [
+    "src"
+  ],
+  "ext": "ts",
+  "ignore": [
+    "src/**/test/**/*"
+  ],
+  "exec": "node -r ts-node/register -r dotenv/config ./src/index.ts"
+}
