@@ -8,7 +8,7 @@ export default class GreetingsController extends Controller {
     super('/greeting');
   }
 
-  protected initializeRouter(): void {
+  protected configureRouter(): void {
     this.router.get('/hello', GreetingsController.hello);
     this.router.get('/greet/:name', GreetingsController.greet);
   }

@@ -12,7 +12,7 @@ export default class CarsController extends Controller {
     super('/cars');
   }
 
-  protected initializeRouter(): void {
+  protected configureRouter(): void {
     this.router.get('/:id', CarsController.findCar);
     this.router.get('/', CarsController.listCars);
     this.router.post(
@@ -21,6 +21,8 @@ export default class CarsController extends Controller {
       CarsController.createCar
     );
   }
+
+  // #region  Endpoints
 
   private static async findCar(req: Request, res: Response): Promise<void> {
     try {
@@ -65,6 +67,10 @@ export default class CarsController extends Controller {
       CarsController.sendUnknownErrorResponse(res, <Error>error);
     }
   }
+
+  // #endregion
+
+  // #region  Body validation
 
   private static async validateBody(
     req: Request,
@@ -119,4 +125,6 @@ export default class CarsController extends Controller {
         .withMessage('"year" must be a number'),
     ];
   }
+
+  // #endregion
 }

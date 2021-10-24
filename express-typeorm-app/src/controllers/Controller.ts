@@ -6,7 +6,7 @@ export default abstract class Controller {
     this.basePath = basePath;
     this.router = Router();
 
-    this.initializeRouter();
+    this.configureRouter();
   }
 
   protected router: Router;
@@ -17,7 +17,7 @@ export default abstract class Controller {
     app.use(this.basePath, this.router);
   }
 
-  protected abstract initializeRouter(): void;
+  protected abstract configureRouter(): void;
 
   protected static respond(
     res: Response,
