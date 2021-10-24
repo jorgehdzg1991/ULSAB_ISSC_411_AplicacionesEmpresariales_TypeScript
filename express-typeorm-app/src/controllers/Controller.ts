@@ -1,4 +1,5 @@
 import { Express, Router, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 export default abstract class Controller {
   constructor(basePath: string) {
@@ -32,5 +33,10 @@ export default abstract class Controller {
     } else {
       res.end();
     }
+  }
+
+  protected static sendUnknownErrorResponse(res: Response, error: Error): void {
+    console.error(error);
+    Controller.respond(res, StatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import FindCarTask from '../tasks/cars/FindCarTask';
-import CreateCarTask from '../tasks/cars/CreateCarTask';
 import Controller from './Controller';
+import FindCarTask from '../tasks/cars/FindCarTask';
+import ListCarsTask from '../tasks/cars/ListCarsTask';
+import CreateCarTask from '../tasks/cars/CreateCarTask';
 import NotFoundException from '../exceptions/NotFoundException';
 
 export default class CarsController extends Controller {
@@ -12,6 +13,7 @@ export default class CarsController extends Controller {
 
   protected initializeRouter(): void {
     this.router.get('/:id', CarsController.findCar);
+    this.router.get('/', CarsController.listCars);
     this.router.post('/', CarsController.createCar);
   }
 
@@ -24,13 +26,24 @@ export default class CarsController extends Controller {
       const car = await task.execute();
 
       CarsController.respond(res, StatusCodes.OK, car);
-    } catch (e) {
-      if (e instanceof NotFoundException) {
+    } catch (error) {
+      if (error instanceof NotFoundException) {
         CarsController.respond(res, StatusCodes.NOT_FOUND);
       } else {
-        console.error(e);
-        CarsController.respond(res, StatusCodes.INTERNAL_SERVER_ERROR);
+        CarsController.sendUnknownErrorResponse(res, <Error>error);
       }
+    }
+  }
+
+  private static async listCars(req: Request, res: Response): Promise<void> {
+    try {
+      const task = new ListCarsTask();
+
+      const cars = await task.execute();
+
+      CarsController.respond(res, StatusCodes.OK, cars);
+    } catch (error) {
+      CarsController.sendUnknownErrorResponse(res, <Error>error);
     }
   }
 
@@ -48,9 +61,8 @@ export default class CarsController extends Controller {
       const newCar = await task.execute();
 
       CarsController.respond(res, StatusCodes.OK, newCar);
-    } catch (e) {
-      console.error(e);
-      CarsController.respond(res, StatusCodes.INTERNAL_SERVER_ERROR);
+    } catch (error) {
+      CarsController.sendUnknownErrorResponse(res, <Error>error);
     }
   }
 }
