@@ -4,7 +4,7 @@ import { check, validationResult, ValidationChain } from 'express-validator';
 import Controller from './Controller';
 import FindCarTask from '../tasks/cars/FindCarTask';
 import ListCarsTask from '../tasks/cars/ListCarsTask';
-import CreateCarTask from '../tasks/cars/CreateCarTask';
+import CreateCarTask, { CarData } from '../tasks/cars/CreateCarTask';
 import NotFoundException from '../exceptions/NotFoundException';
 
 export default class CarsController extends Controller {
@@ -24,9 +24,9 @@ export default class CarsController extends Controller {
     try {
       const { id } = req.params;
 
-      const task = new FindCarTask(id);
+      const findCarTask = new FindCarTask(id);
 
-      const car = await task.execute();
+      const car = await findCarTask.execute();
 
       CarsController.respond(res, StatusCodes.OK, car);
     } catch (error) {
@@ -40,9 +40,9 @@ export default class CarsController extends Controller {
 
   private static async listCars(req: Request, res: Response): Promise<void> {
     try {
-      const task = new ListCarsTask();
+      const listCarsTask = new ListCarsTask();
 
-      const cars = await task.execute();
+      const cars = await listCarsTask.execute();
 
       CarsController.respond(res, StatusCodes.OK, cars);
     } catch (error) {
@@ -52,28 +52,23 @@ export default class CarsController extends Controller {
 
   private static async createCar(req: Request, res: Response): Promise<void> {
     try {
-      const result = validationResult(req);
+      const validationErrors = validationResult(req);
 
-      if (!result.isEmpty()) {
+      if (!validationErrors.isEmpty()) {
         CarsController.respond(res, StatusCodes.BAD_REQUEST, {
-          errors: result.array(),
+          errors: validationErrors.array(),
         });
 
         return;
       }
 
-      const { brand, model, submodel, year } = req.body;
+      const carData = <CarData>req.body;
 
-      const task = new CreateCarTask(
-        <string>brand,
-        <string>model,
-        <string>submodel,
-        <number>year
-      );
+      const createCarTask = new CreateCarTask(carData);
 
-      const newCar = await task.execute();
+      const car = await createCarTask.execute();
 
-      CarsController.respond(res, StatusCodes.OK, newCar);
+      CarsController.respond(res, StatusCodes.OK, car);
     } catch (error) {
       CarsController.sendUnknownErrorResponse(res, <Error>error);
     }

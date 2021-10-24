@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export default class Car {
@@ -16,7 +16,7 @@ export default class Car {
     this.year = year;
   }
 
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   public id: string;
 
   @Column('varchar', { length: 32, nullable: false })
