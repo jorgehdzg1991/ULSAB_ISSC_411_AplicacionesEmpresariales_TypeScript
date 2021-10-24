@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { check, validationResult, ValidationChain } from 'express-validator';
 import Controller from './Controller';
 import FindCarTask from '../tasks/cars/FindCarTask';
 import ListCarsTask from '../tasks/cars/ListCarsTask';
@@ -12,9 +13,11 @@ export default class CarsController extends Controller {
   }
 
   protected initializeRouter(): void {
+    const bodyValidation = CarsController.getBodyValidation();
+
     this.router.get('/:id', CarsController.findCar);
     this.router.get('/', CarsController.listCars);
-    this.router.post('/', CarsController.createCar);
+    this.router.post('/', bodyValidation, CarsController.createCar);
   }
 
   private static async findCar(req: Request, res: Response): Promise<void> {
@@ -49,6 +52,16 @@ export default class CarsController extends Controller {
 
   private static async createCar(req: Request, res: Response): Promise<void> {
     try {
+      const result = validationResult(req);
+
+      if (!result.isEmpty()) {
+        CarsController.respond(res, StatusCodes.BAD_REQUEST, {
+          errors: result.array(),
+        });
+
+        return;
+      }
+
       const { brand, model, submodel, year } = req.body;
 
       const task = new CreateCarTask(
@@ -64,5 +77,29 @@ export default class CarsController extends Controller {
     } catch (error) {
       CarsController.sendUnknownErrorResponse(res, <Error>error);
     }
+  }
+
+  private static getBodyValidation(): ValidationChain[] {
+    return [
+      check('brand')
+        .exists()
+        .withMessage('"brand" was missing in the request body')
+        .isString()
+        .withMessage('"brand" must be a string'),
+      check('model')
+        .exists()
+        .withMessage('"model" was missing in the request body')
+        .isString()
+        .withMessage('"model" must be a string'),
+      check('submodel')
+        .optional()
+        .isString()
+        .withMessage('"submodel" must be a string'),
+      check('year')
+        .exists()
+        .withMessage('"year" was missing in the request body')
+        .isNumeric()
+        .withMessage('"year" must be a number'),
+    ];
   }
 }

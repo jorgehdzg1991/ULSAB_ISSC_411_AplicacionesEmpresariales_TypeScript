@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import StatusCodes from 'http-status-codes';
-import Greeting from '../models/entities/Greeting';
+import Greeting from '../models/Greeting';
 import Controller from './Controller';
 
 export default class GreetingsController extends Controller {

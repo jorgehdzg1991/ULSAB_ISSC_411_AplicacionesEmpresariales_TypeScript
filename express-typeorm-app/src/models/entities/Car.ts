@@ -25,7 +25,7 @@ export default class Car {
   @Column('varchar', { length: 32, nullable: false })
   public model: string;
 
-  @Column('varchar', { length: 32 })
+  @Column('varchar', { length: 32, default: null })
   public submodel: string;
 
   @Column('smallint', { nullable: false })
