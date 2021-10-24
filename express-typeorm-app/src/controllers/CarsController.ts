@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { check, validationResult, ValidationChain } from 'express-validator';
 import Controller from './Controller';
@@ -13,11 +13,13 @@ export default class CarsController extends Controller {
   }
 
   protected initializeRouter(): void {
-    const bodyValidation = CarsController.getBodyValidation();
-
     this.router.get('/:id', CarsController.findCar);
     this.router.get('/', CarsController.listCars);
-    this.router.post('/', bodyValidation, CarsController.createCar);
+    this.router.post(
+      '/',
+      CarsController.validateBody,
+      CarsController.createCar
+    );
   }
 
   private static async findCar(req: Request, res: Response): Promise<void> {
@@ -52,16 +54,6 @@ export default class CarsController extends Controller {
 
   private static async createCar(req: Request, res: Response): Promise<void> {
     try {
-      const validationErrors = validationResult(req);
-
-      if (!validationErrors.isEmpty()) {
-        CarsController.respond(res, StatusCodes.BAD_REQUEST, {
-          errors: validationErrors.array(),
-        });
-
-        return;
-      }
-
       const carData = <CarData>req.body;
 
       const createCarTask = new CreateCarTask(carData);
@@ -74,7 +66,37 @@ export default class CarsController extends Controller {
     }
   }
 
-  private static getBodyValidation(): ValidationChain[] {
+  private static async validateBody(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    await CarsController.runValidation(req);
+
+    const validationErrors = validationResult(req);
+
+    if (!validationErrors.isEmpty()) {
+      CarsController.respond(res, StatusCodes.BAD_REQUEST, {
+        errors: validationErrors.array(),
+      });
+
+      return;
+    }
+
+    next();
+  }
+
+  private static async runValidation(req: Request): Promise<void> {
+    const carBodyValidation = CarsController.getCarBodyValidation();
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const validation of carBodyValidation) {
+      // eslint-disable-next-line no-await-in-loop
+      await validation.run(req);
+    }
+  }
+
+  private static getCarBodyValidation(): ValidationChain[] {
     return [
       check('brand')
         .exists()
