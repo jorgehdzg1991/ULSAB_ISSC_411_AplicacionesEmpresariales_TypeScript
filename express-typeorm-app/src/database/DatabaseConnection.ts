@@ -1,5 +1,10 @@
 import path from 'path';
-import { createConnection, Connection } from 'typeorm';
+import {
+  createConnection,
+  Connection,
+  Repository,
+  EntityTarget,
+} from 'typeorm';
 
 export default class DatabaseConnection {
   private static connection: Connection;
@@ -26,5 +31,12 @@ export default class DatabaseConnection {
     }
 
     return DatabaseConnection.connection;
+  }
+
+  public static async getRepository<Entity>(
+    target: EntityTarget<Entity>
+  ): Promise<Repository<Entity>> {
+    const connection = await DatabaseConnection.getConnectedInstance();
+    return connection.getRepository(target);
   }
 }

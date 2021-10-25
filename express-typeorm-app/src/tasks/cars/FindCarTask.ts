@@ -11,8 +11,7 @@ export default class FindCarTask implements IAsyncTask<Car> {
   private id: string;
 
   public async execute(): Promise<Car> {
-    const connection = await DatabaseConnection.getConnectedInstance();
-    const carRepository = connection.getRepository(Car);
+    const carRepository = await DatabaseConnection.getRepository(Car);
 
     const car = await carRepository.findOne(this.id);
 

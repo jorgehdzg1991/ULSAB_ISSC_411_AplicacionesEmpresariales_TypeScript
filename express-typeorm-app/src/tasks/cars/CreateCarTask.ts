@@ -17,9 +17,7 @@ export default class CreateCarTask implements IAsyncTask<Car> {
   private data: CarData;
 
   public async execute(): Promise<Car> {
-    const connection = await DatabaseConnection.getConnectedInstance();
-    const carRepository = connection.getRepository(Car);
-
+    const carRepository = await DatabaseConnection.getRepository(Car);
     return carRepository.save(this.data);
   }
 }
