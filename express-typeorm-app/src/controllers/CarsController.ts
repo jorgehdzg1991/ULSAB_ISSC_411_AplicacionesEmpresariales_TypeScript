@@ -4,8 +4,9 @@ import { check, validationResult, ValidationChain } from 'express-validator';
 import Controller from './Controller';
 import FindCarTask from '../tasks/cars/FindCarTask';
 import ListCarsTask from '../tasks/cars/ListCarsTask';
-import CreateCarTask, { CarData } from '../tasks/cars/CreateCarTask';
+import CreateCarTask, { CreateCarData } from '../tasks/cars/CreateCarTask';
 import NotFoundException from '../exceptions/NotFoundException';
+import UpdateCarTask, { UpdateCarData } from '../tasks/cars/UpdateCarTask';
 
 export default class CarsController extends Controller {
   constructor() {
@@ -19,6 +20,11 @@ export default class CarsController extends Controller {
       '/',
       CarsController.validateBody,
       CarsController.createCar
+    );
+    this.router.put(
+      '/:id',
+      CarsController.validateBody,
+      CarsController.updateCar
     );
   }
 
@@ -56,7 +62,7 @@ export default class CarsController extends Controller {
 
   private static async createCar(req: Request, res: Response): Promise<void> {
     try {
-      const carData = <CarData>req.body;
+      const carData = <CreateCarData>req.body;
 
       const createCarTask = new CreateCarTask(carData);
 
@@ -65,6 +71,25 @@ export default class CarsController extends Controller {
       CarsController.respond(res, StatusCodes.OK, car);
     } catch (error) {
       CarsController.sendUnknownErrorResponse(res, <Error>error);
+    }
+  }
+
+  private static async updateCar(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const carData = <UpdateCarData>req.body;
+
+      const updateCarTask = new UpdateCarTask(id, carData);
+
+      const car = await updateCarTask.execute();
+
+      CarsController.respond(res, StatusCodes.OK, car);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        CarsController.respond(res, StatusCodes.NOT_FOUND);
+      } else {
+        CarsController.sendUnknownErrorResponse(res, <Error>error);
+      }
     }
   }
 

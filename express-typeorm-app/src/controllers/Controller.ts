@@ -1,5 +1,6 @@
 import { Express, Router, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import _ from 'lodash';
 
 export default abstract class Controller {
   constructor(basePath: string) {
@@ -22,14 +23,16 @@ export default abstract class Controller {
   protected static respond(
     res: Response,
     statusCode: number,
-    data?: unknown,
+    data?: object,
     contentType = 'application/json'
   ): void {
     res.writeHead(statusCode, {
       'Content-Type': contentType,
     });
+
     if (data) {
-      res.end(JSON.stringify(data));
+      const cleanData = Controller.cleanData(data);
+      res.end(JSON.stringify(cleanData));
     } else {
       res.end();
     }
@@ -38,5 +41,21 @@ export default abstract class Controller {
   protected static sendUnknownErrorResponse(res: Response, error: Error): void {
     console.error(error);
     Controller.respond(res, StatusCodes.INTERNAL_SERVER_ERROR);
+  }
+
+  private static cleanData(data: object): object {
+    if (_.isArray(data)) {
+      return data.map((item) => Controller.cleanData(item));
+    }
+    return Controller.cleanObject(data);
+  }
+
+  private static cleanObject(data: object): object {
+    const dataWithoutUndefinedValues = _.omitBy(data, _.isUndefined);
+    const dataWithoutNullAndUndefinedValues = _.omitBy(
+      dataWithoutUndefinedValues,
+      _.isNull
+    );
+    return dataWithoutNullAndUndefinedValues;
   }
 }
