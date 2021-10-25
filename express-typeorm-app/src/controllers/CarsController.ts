@@ -7,6 +7,7 @@ import ListCarsTask from '../tasks/cars/ListCarsTask';
 import CreateCarTask, { CreateCarData } from '../tasks/cars/CreateCarTask';
 import NotFoundException from '../exceptions/NotFoundException';
 import UpdateCarTask, { UpdateCarData } from '../tasks/cars/UpdateCarTask';
+import DeleteCarTask from '../tasks/cars/DeleteCarTask';
 
 export default class CarsController extends Controller {
   constructor() {
@@ -26,6 +27,7 @@ export default class CarsController extends Controller {
       CarsController.validateBody,
       CarsController.updateCar
     );
+    this.router.delete('/:id', CarsController.deleteCar);
   }
 
   // #region  Endpoints
@@ -90,6 +92,20 @@ export default class CarsController extends Controller {
       } else {
         CarsController.sendUnknownErrorResponse(res, <Error>error);
       }
+    }
+  }
+
+  private static async deleteCar(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+
+      const deleteCarTask = new DeleteCarTask(id);
+
+      await deleteCarTask.execute();
+
+      CarsController.respond(res, StatusCodes.OK);
+    } catch (error) {
+      CarsController.sendUnknownErrorResponse(res, <Error>error);
     }
   }
 
