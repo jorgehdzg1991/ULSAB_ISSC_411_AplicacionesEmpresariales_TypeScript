@@ -32,6 +32,31 @@ export default class CarsController extends Controller {
 
   // #region  Endpoints
 
+  /**
+   * @api {get} /cars/:id Find car by ID
+   * @apiName FindCar
+   * @apiGroup Cars
+   *
+   * @apiParam {Number} id Car ID
+   *
+   * @apiSuccess {String} id Car ID
+   * @apiSuccess {String} brand Brand name
+   * @apiSuccess {String} model Model
+   * @apiSuccess {String} [submodel] Submodel
+   * @apiSuccess {String} year Year
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   *  {
+   *    "id": "00000000-0000-0000-0000-000000000000",
+   *    "brand": "KIA",
+   *    "model": "Rio",
+   *    "submodel": "Rio LX",
+   *    "year": "2018"
+   *  }
+   *
+   * @apiError 404 Car with specified ID wasn't found
+   */
   private static async findCar(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
