@@ -35,6 +35,7 @@ export default class CarsController extends Controller {
   /**
    * @api {get} /cars/:id Find car
    * @apiName findCar
+   * @apiDescription Finds a car by ID from the database
    * @apiGroup Cars API
    *
    * @apiParam {Number} id Car ID
@@ -78,6 +79,7 @@ export default class CarsController extends Controller {
   /**
    * @api {get} /cars Get list of cars
    * @apiName listCars
+   * @apiDescription Returns a list of cars from the database
    * @apiGroup Cars API
    *
    * @apiSuccess {Object[]} cars List of cars
@@ -127,6 +129,7 @@ export default class CarsController extends Controller {
   /**
    * @api {post} /cars Create car
    * @apiName createCar
+   * @apiDescription Creates a new car and saves it to the database
    * @apiGroup Cars API
    *
    * @apiBody {String} brand Brand name
@@ -177,6 +180,7 @@ export default class CarsController extends Controller {
   /**
    * @api {put} /cars/:id Update car
    * @apiName updateCar
+   * @apiDescription Updates an existing car in the database
    * @apiGroup Cars API
    *
    * @apiParam {Number} id Car ID
@@ -235,6 +239,7 @@ export default class CarsController extends Controller {
   /**
    * @api {delete} /cars/:id Delete car
    * @apiName deleteCar
+   * @apiDescription Deletes a car from the database
    * @apiGroup Cars API
    *
    * @apiParam {Number} id Car ID
