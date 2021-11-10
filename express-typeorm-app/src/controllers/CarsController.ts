@@ -33,9 +33,9 @@ export default class CarsController extends Controller {
   // #region  Endpoints
 
   /**
-   * @api {get} /cars/:id Find car by ID
-   * @apiName FindCar
-   * @apiGroup Cars
+   * @api {get} /cars/:id Find car
+   * @apiName findCar
+   * @apiGroup Cars API
    *
    * @apiParam {Number} id Car ID
    *
@@ -55,7 +55,7 @@ export default class CarsController extends Controller {
    *    "year": "2018"
    *  }
    *
-   * @apiError 404 Car with specified ID wasn't found
+   * @apiError 404 Car wasn't found
    */
   private static async findCar(req: Request, res: Response): Promise<void> {
     try {
@@ -75,6 +75,43 @@ export default class CarsController extends Controller {
     }
   }
 
+  /**
+   * @api {get} /cars Get list of cars
+   * @apiName listCars
+   * @apiGroup Cars API
+   *
+   * @apiSuccess {Object[]} cars List of cars
+   * @apiSuccess {String} cars.id Car ID
+   * @apiSuccess {String} cars.brand Brand name
+   * @apiSuccess {String} cars.model Model
+   * @apiSuccess {String} [cars.submodel] Submodel
+   * @apiSuccess {String} cars.year Year
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   *  [
+   *    {
+   *      "id": "00000000-0000-0000-0000-000000000000",
+   *      "brand": "KIA",
+   *      "model": "Rio",
+   *      "submodel": "Rio LX",
+   *      "year": "2018"
+   *    },
+   *    {
+   *      "id": "00000000-0000-0000-0000-000000000001",
+   *      "brand": "KIA",
+   *      "model": "Rio",
+   *      "submodel": "Rio EX",
+   *      "year": "2018"
+   *    },   *    {
+   *      "id": "00000000-0000-0000-0000-000000000002",
+   *      "brand": "KIA",
+   *      "model": "Forte",
+   *      "submodel": "Forte LX",
+   *      "year": "2018"
+   *    }
+   *  ]
+   */
   private static async listCars(req: Request, res: Response): Promise<void> {
     try {
       const listCarsTask = new ListCarsTask();
@@ -87,6 +124,42 @@ export default class CarsController extends Controller {
     }
   }
 
+  /**
+   * @api {post} /cars Create car
+   * @apiName createCar
+   * @apiGroup Cars API
+   *
+   * @apiBody {String} brand Brand name
+   * @apiBody {String} model Model
+   * @apiBody {String} [submodel] Submodel
+   * @apiBody {String} year Year
+   *
+   * @apiParamExample {json} Request-Example
+   *  {
+   *    "brand": "KIA",
+   *    "model": "Rio",
+   *    "submodel": "Rio LX",
+   *    "year": "2018"
+   *  }
+   *
+   * @apiSuccess {String} id Car ID
+   * @apiSuccess {String} brand Brand name
+   * @apiSuccess {String} model Model
+   * @apiSuccess {String} [submodel] Submodel
+   * @apiSuccess {String} year Year
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   *  {
+   *    "id": "00000000-0000-0000-0000-000000000000",
+   *    "brand": "KIA",
+   *    "model": "Rio",
+   *    "submodel": "Rio LX",
+   *    "year": "2018"
+   *  }
+   *
+   * @apiError 400 Body validation failed
+   */
   private static async createCar(req: Request, res: Response): Promise<void> {
     try {
       const carData = <CreateCarData>req.body;
@@ -101,6 +174,45 @@ export default class CarsController extends Controller {
     }
   }
 
+  /**
+   * @api {put} /cars/:id Update car
+   * @apiName updateCar
+   * @apiGroup Cars API
+   *
+   * @apiParam {Number} id Car ID
+   *
+   * @apiBody {String} brand Brand name
+   * @apiBody {String} model Model
+   * @apiBody {String} [submodel] Submodel
+   * @apiBody {String} year Year
+   *
+   * @apiParamExample {json} Request-Example
+   *  {
+   *    "brand": "KIA",
+   *    "model": "Rio",
+   *    "submodel": "Rio LX",
+   *    "year": "2018"
+   *  }
+   *
+   * @apiSuccess {String} id Car ID
+   * @apiSuccess {String} brand Brand name
+   * @apiSuccess {String} model Model
+   * @apiSuccess {String} [submodel] Submodel
+   * @apiSuccess {String} year Year
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   *  {
+   *    "id": "00000000-0000-0000-0000-000000000000",
+   *    "brand": "KIA",
+   *    "model": "Rio",
+   *    "submodel": "Rio LX",
+   *    "year": "2018"
+   *  }
+   *
+   * @apiError 400 Body validation failed
+   * @apiError 404 Car wasn't found
+   */
   private static async updateCar(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -120,6 +232,16 @@ export default class CarsController extends Controller {
     }
   }
 
+  /**
+   * @api {delete} /cars/:id Delete car
+   * @apiName deleteCar
+   * @apiGroup Cars API
+   *
+   * @apiParam {Number} id Car ID
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   */
   private static async deleteCar(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
