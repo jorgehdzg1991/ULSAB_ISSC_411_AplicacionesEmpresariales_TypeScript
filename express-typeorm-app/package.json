@@ -10,7 +10,7 @@
     "build": "yarn clean && tsc --build",
     "test": "mocha",
     "coverage": "nyc mocha",
-    "lint": "eslint --ext .ts src",
+    "lint": "eslint --ext .ts src test",
     "lint:fix": "yarn lint --fix",
     "docs": "yarn clean:docs && apidoc -c ./apidoc.json -i src -o docs",
     "sanity": "yarn lint && yarn build && yarn docs"
