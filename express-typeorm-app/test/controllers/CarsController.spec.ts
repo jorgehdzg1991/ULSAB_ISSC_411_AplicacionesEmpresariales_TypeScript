@@ -5,7 +5,8 @@ import request from 'supertest';
 import app from '../../src/app';
 import NotFoundException from '../../src/exceptions/NotFoundException';
 import Car from '../../src/models/entities/Car';
-import FindCarTaskMock from '../test-doubles/mocks/FindCarTaskMock';
+import FindCarTaskMock from './test-doubles/FindCarTaskMock';
+import ListCarsTaskMock from './test-doubles/ListCarsTaskMock';
 
 describe('CarsController tests', () => {
   let sandbox: SinonSandbox;
@@ -17,6 +18,22 @@ describe('CarsController tests', () => {
     'KIA',
     'Rio',
     'Rio LX',
+    2018
+  );
+
+  const kiaRioEx2018 = new Car(
+    '00000000-0000-0000-0000-000000000001',
+    'KIA',
+    'Rio',
+    'Rio EX',
+    2018
+  );
+
+  const kiaForteLx2018 = new Car(
+    '00000000-0000-0000-0000-000000000002',
+    'KIA',
+    'Forte',
+    'Forte EX',
     2018
   );
 
@@ -69,6 +86,44 @@ describe('CarsController tests', () => {
 
       request(app)
         .get(findCarPath)
+        .expect(StatusCodes.INTERNAL_SERVER_ERROR)
+        .end(() => done());
+    });
+  });
+
+  describe('listCars --> GET /cars', () => {
+    let listCarsTaskMock: ListCarsTaskMock;
+
+    const listCarsPath = carsPath;
+    const listOfCars = [kiaRioLx2018, kiaRioEx2018, kiaForteLx2018];
+
+    beforeEach(() => {
+      listCarsTaskMock = new ListCarsTaskMock(sandbox);
+    });
+
+    it('should return a list of cars', (done) => {
+      listCarsTaskMock.withExecuteReturing(listOfCars);
+
+      request(app)
+        .get(listCarsPath)
+        .expect(StatusCodes.OK)
+        .end((err, res) => {
+          if (err) {
+            done(err);
+          } else {
+            expect(res.body).toEqual(listOfCars);
+            done();
+          }
+        });
+    });
+
+    it('should return InternalServerError if unknown error ocurrs', (done) => {
+      listCarsTaskMock.withExecuteThrowing(
+        new Error('I have a bad feeling about this')
+      );
+
+      request(app)
+        .get(listCarsPath)
         .expect(StatusCodes.INTERNAL_SERVER_ERROR)
         .end(() => done());
     });
