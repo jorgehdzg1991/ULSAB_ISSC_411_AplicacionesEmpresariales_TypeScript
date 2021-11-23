@@ -38,8 +38,7 @@ export default abstract class Controller {
     }
   }
 
-  protected static sendUnknownErrorResponse(res: Response, error: Error): void {
-    console.error(error);
+  protected static sendUnknownErrorResponse(res: Response): void {
     Controller.respond(res, StatusCodes.INTERNAL_SERVER_ERROR);
   }
 

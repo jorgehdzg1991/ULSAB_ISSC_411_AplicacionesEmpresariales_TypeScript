@@ -68,10 +68,12 @@ export default class CarsController extends Controller {
 
       CarsController.respond(res, StatusCodes.OK, car);
     } catch (error) {
+      console.error(error);
+
       if (error instanceof NotFoundException) {
         CarsController.respond(res, StatusCodes.NOT_FOUND);
       } else {
-        CarsController.sendUnknownErrorResponse(res, <Error>error);
+        CarsController.sendUnknownErrorResponse(res);
       }
     }
   }
@@ -122,7 +124,8 @@ export default class CarsController extends Controller {
 
       CarsController.respond(res, StatusCodes.OK, cars);
     } catch (error) {
-      CarsController.sendUnknownErrorResponse(res, <Error>error);
+      console.error(error);
+      CarsController.sendUnknownErrorResponse(res);
     }
   }
 
@@ -173,7 +176,8 @@ export default class CarsController extends Controller {
 
       CarsController.respond(res, StatusCodes.OK, car);
     } catch (error) {
-      CarsController.sendUnknownErrorResponse(res, <Error>error);
+      console.error(error);
+      CarsController.sendUnknownErrorResponse(res);
     }
   }
 
@@ -228,10 +232,12 @@ export default class CarsController extends Controller {
 
       CarsController.respond(res, StatusCodes.OK, car);
     } catch (error) {
+      console.error(error);
+
       if (error instanceof NotFoundException) {
         CarsController.respond(res, StatusCodes.NOT_FOUND);
       } else {
-        CarsController.sendUnknownErrorResponse(res, <Error>error);
+        CarsController.sendUnknownErrorResponse(res);
       }
     }
   }
@@ -257,7 +263,8 @@ export default class CarsController extends Controller {
 
       CarsController.respond(res, StatusCodes.OK);
     } catch (error) {
-      CarsController.sendUnknownErrorResponse(res, <Error>error);
+      console.error(error);
+      CarsController.sendUnknownErrorResponse(res);
     }
   }
 
@@ -276,7 +283,7 @@ export default class CarsController extends Controller {
 
     if (!validationErrors.isEmpty()) {
       CarsController.respond(res, StatusCodes.BAD_REQUEST, {
-        errors: validationErrors.array(),
+        errors: validationErrors.array().map((e) => e.msg),
       });
 
       return;

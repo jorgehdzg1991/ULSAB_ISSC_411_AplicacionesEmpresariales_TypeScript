@@ -5,7 +5,7 @@ import IAsyncTask from '../IAsyncTask';
 export type CreateCarData = {
   brand: string;
   model: string;
-  submodel: string;
+  submodel?: string;
   year: number;
 };
 

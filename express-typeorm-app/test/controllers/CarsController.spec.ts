@@ -5,13 +5,17 @@ import request from 'supertest';
 import app from '../../src/app';
 import NotFoundException from '../../src/exceptions/NotFoundException';
 import Car from '../../src/models/entities/Car';
+import { CreateCarData } from '../../src/tasks/cars/CreateCarTask';
+import CreateCarTaskMock from './test-doubles/CreateCarTaskMock';
 import FindCarTaskMock from './test-doubles/FindCarTaskMock';
 import ListCarsTaskMock from './test-doubles/ListCarsTaskMock';
 
 describe('CarsController tests', () => {
   let sandbox: SinonSandbox;
 
-  const carsPath = '/cars';
+  const carsApiPath = '/cars';
+
+  // #region Cars used in this test
 
   const kiaRioLx2018 = new Car(
     '00000000-0000-0000-0000-000000000000',
@@ -37,6 +41,8 @@ describe('CarsController tests', () => {
     2018
   );
 
+  // #endregion
+
   before(() => {
     sandbox = sinon.createSandbox();
   });
@@ -45,10 +51,10 @@ describe('CarsController tests', () => {
     sandbox.restore();
   });
 
-  describe('findCar --> GET /cars/:id', () => {
+  context('findCar --> GET /cars/:id', () => {
     let findCarTaskMock: FindCarTaskMock;
 
-    const findCarPath = `${carsPath}/${kiaRioLx2018.id}`;
+    const findCarPath = `${carsApiPath}/${kiaRioLx2018.id}`;
 
     beforeEach(() => {
       findCarTaskMock = new FindCarTaskMock(sandbox);
@@ -79,7 +85,7 @@ describe('CarsController tests', () => {
         .end(() => done());
     });
 
-    it('should return InternalServerError if unknown error ocurrs', (done) => {
+    it('should return InternalServerError if unknown error occurs', (done) => {
       findCarTaskMock.withExecuteThrowing(
         new Error('I have a bad feeling about this')
       );
@@ -91,10 +97,10 @@ describe('CarsController tests', () => {
     });
   });
 
-  describe('listCars --> GET /cars', () => {
+  context('listCars --> GET /cars', () => {
     let listCarsTaskMock: ListCarsTaskMock;
 
-    const listCarsPath = carsPath;
+    const listCarsPath = carsApiPath;
     const listOfCars = [kiaRioLx2018, kiaRioEx2018, kiaForteLx2018];
 
     beforeEach(() => {
@@ -117,7 +123,7 @@ describe('CarsController tests', () => {
         });
     });
 
-    it('should return InternalServerError if unknown error ocurrs', (done) => {
+    it('should return InternalServerError if unknown error occurs', (done) => {
       listCarsTaskMock.withExecuteThrowing(
         new Error('I have a bad feeling about this')
       );
@@ -126,6 +132,116 @@ describe('CarsController tests', () => {
         .get(listCarsPath)
         .expect(StatusCodes.INTERNAL_SERVER_ERROR)
         .end(() => done());
+    });
+  });
+
+  context('createCar --> POST /cars', () => {
+    let createCarTaskMock: CreateCarTaskMock;
+
+    const createCarData: CreateCarData = {
+      brand: kiaRioLx2018.brand,
+      model: kiaRioLx2018.model,
+      submodel: kiaRioLx2018.submodel,
+      year: kiaRioLx2018.year,
+    };
+
+    beforeEach(() => {
+      createCarTaskMock = new CreateCarTaskMock(sandbox);
+    });
+
+    it('should create a car', (done) => {
+      createCarTaskMock.withExecuteReturing(kiaRioLx2018);
+
+      request(app)
+        .post(carsApiPath)
+        .set('Content-Type', 'application/json')
+        .send(createCarData)
+        .expect(StatusCodes.OK)
+        .end((err, res) => {
+          if (err) {
+            done(err);
+          } else {
+            const car = <Car>res.body;
+            expect(car).toEqual(kiaRioLx2018);
+            done();
+          }
+        });
+    });
+
+    context('body validation', () => {
+      it('should return BadRequest if any of the required properties of the body are missing', (done) => {
+        createCarTaskMock.withExecuteReturing(kiaRioLx2018);
+
+        const emptyBody = {};
+
+        const expectedValidationErrors = {
+          errors: [
+            '"brand" was missing in the request body',
+            '"brand" must be a string',
+            '"model" was missing in the request body',
+            '"model" must be a string',
+            '"year" was missing in the request body',
+            '"year" must be a number',
+          ],
+        };
+
+        request(app)
+          .post(carsApiPath)
+          .set('Content-Type', 'application/json')
+          .send(emptyBody)
+          .expect(StatusCodes.BAD_REQUEST)
+          .end((err, res) => {
+            if (err) {
+              done(err);
+            } else {
+              expect(res.body).toEqual(expectedValidationErrors);
+              done();
+            }
+          });
+      });
+
+      it('"submodel" should be optional', (done) => {
+        createCarTaskMock.withExecuteReturing(kiaRioLx2018);
+
+        const createCarDataWithoutSubmodel: CreateCarData = {
+          ...createCarData,
+          submodel: undefined,
+        };
+
+        request(app)
+          .post(carsApiPath)
+          .set('Content-Type', 'application/json')
+          .send(createCarDataWithoutSubmodel)
+          .expect(StatusCodes.OK)
+          .end((err, res) => {
+            if (err) {
+              done(err);
+            } else {
+              const car = <Car>res.body;
+              expect(car).toEqual(kiaRioLx2018);
+              done();
+            }
+          });
+      });
+    });
+
+    it('should return InternalServerError if unknown error occurs', (done) => {
+      createCarTaskMock.withExecuteThrowing(
+        new Error('I have a bad feeling about this')
+      );
+
+      request(app)
+        .post(carsApiPath)
+        .set('Content-Type', 'application/json')
+        .send(createCarData)
+        .expect(StatusCodes.INTERNAL_SERVER_ERROR)
+        .end((err) => {
+          if (err) {
+            done(err);
+          } else {
+            done();
+          }
+        });
     });
   });
 });
