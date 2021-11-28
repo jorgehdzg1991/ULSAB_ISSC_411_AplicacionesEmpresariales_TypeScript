@@ -9,6 +9,8 @@ import { CreateCarData } from '../../src/tasks/cars/CreateCarTask';
 import CreateCarTaskMock from './test-doubles/CreateCarTaskMock';
 import FindCarTaskMock from './test-doubles/FindCarTaskMock';
 import ListCarsTaskMock from './test-doubles/ListCarsTaskMock';
+import UpdateCarTaskMock from './test-doubles/UpdateCarTaskMock';
+import { UpdateCarData } from '../../src/tasks/cars/UpdateCarTask';
 
 describe('CarsController tests', () => {
   let sandbox: SinonSandbox;
@@ -61,7 +63,7 @@ describe('CarsController tests', () => {
     });
 
     it('should find a car by id', (done) => {
-      findCarTaskMock.withExecuteReturing(kiaRioLx2018);
+      findCarTaskMock.withExecuteReturning(kiaRioLx2018);
 
       request(app)
         .get(findCarPath)
@@ -108,7 +110,7 @@ describe('CarsController tests', () => {
     });
 
     it('should return a list of cars', (done) => {
-      listCarsTaskMock.withExecuteReturing(listOfCars);
+      listCarsTaskMock.withExecuteReturning(listOfCars);
 
       request(app)
         .get(listCarsPath)
@@ -150,7 +152,7 @@ describe('CarsController tests', () => {
     });
 
     it('should create a car', (done) => {
-      createCarTaskMock.withExecuteReturing(kiaRioLx2018);
+      createCarTaskMock.withExecuteReturning(kiaRioLx2018);
 
       request(app)
         .post(carsApiPath)
@@ -168,9 +170,28 @@ describe('CarsController tests', () => {
         });
     });
 
+    it('should return InternalServerError if unknown error occurs', (done) => {
+      createCarTaskMock.withExecuteThrowing(
+        new Error('I have a bad feeling about this')
+      );
+
+      request(app)
+        .post(carsApiPath)
+        .set('Content-Type', 'application/json')
+        .send(createCarData)
+        .expect(StatusCodes.INTERNAL_SERVER_ERROR)
+        .end((err) => {
+          if (err) {
+            done(err);
+          } else {
+            done();
+          }
+        });
+    });
+
     context('body validation', () => {
       it('should return BadRequest if any of the required properties of the body are missing', (done) => {
-        createCarTaskMock.withExecuteReturing(kiaRioLx2018);
+        createCarTaskMock.withExecuteReturning(kiaRioLx2018);
 
         const emptyBody = {};
 
@@ -201,7 +222,7 @@ describe('CarsController tests', () => {
       });
 
       it('"submodel" should be optional', (done) => {
-        createCarTaskMock.withExecuteReturing(kiaRioLx2018);
+        createCarTaskMock.withExecuteReturning(kiaRioLx2018);
 
         const createCarDataWithoutSubmodel: CreateCarData = {
           ...createCarData,
@@ -224,16 +245,69 @@ describe('CarsController tests', () => {
           });
       });
     });
+  });
 
-    it('should return InternalServerError if unknown error occurs', (done) => {
-      createCarTaskMock.withExecuteThrowing(
+  context('updateCar --> PUT /cars/:id', () => {
+    let updateCarTaskMock: UpdateCarTaskMock;
+
+    const updateCarPath = `/cars/${kiaRioLx2018.id}`;
+    const updatedCar = kiaRioLx2018;
+    const updateCarData: UpdateCarData = {
+      brand: updatedCar.brand,
+      model: updatedCar.model,
+      submodel: updatedCar.submodel,
+      year: updatedCar.year,
+    };
+
+    beforeEach(() => {
+      updateCarTaskMock = new UpdateCarTaskMock(sandbox);
+    });
+
+    it('should update a car', (done) => {
+      updateCarTaskMock.withExecuteReturning(updatedCar);
+
+      request(app)
+        .put(updateCarPath)
+        .set('Content-Type', 'application/json')
+        .send(updateCarData)
+        .expect(StatusCodes.OK)
+        .end((err, res) => {
+          if (err) {
+            done(err);
+          } else {
+            const car = <Car>res.body;
+            expect(car).toEqual(kiaRioLx2018);
+            done();
+          }
+        });
+    });
+
+    it("should return NotFound if car doesn't exist", (done) => {
+      updateCarTaskMock.withExecuteThrowing(new NotFoundException());
+
+      request(app)
+        .put(updateCarPath)
+        .set('Content-Type', 'application/json')
+        .send(updateCarData)
+        .expect(StatusCodes.NOT_FOUND)
+        .end((err) => {
+          if (err) {
+            done(err);
+          } else {
+            done();
+          }
+        });
+    });
+
+    it('should return InternalServerError if an unknown error occurs', (done) => {
+      updateCarTaskMock.withExecuteThrowing(
         new Error('I have a bad feeling about this')
       );
 
       request(app)
-        .post(carsApiPath)
+        .put(updateCarPath)
         .set('Content-Type', 'application/json')
-        .send(createCarData)
+        .send(updateCarData)
         .expect(StatusCodes.INTERNAL_SERVER_ERROR)
         .end((err) => {
           if (err) {
@@ -242,6 +316,63 @@ describe('CarsController tests', () => {
             done();
           }
         });
+    });
+
+    context('body validation', () => {
+      it('should return BadRequest if any of the required properties of the body are missing', (done) => {
+        updateCarTaskMock.withExecuteReturning(kiaRioLx2018);
+
+        const emptyBody = {};
+
+        const expectedValidationErrors = {
+          errors: [
+            '"brand" was missing in the request body',
+            '"brand" must be a string',
+            '"model" was missing in the request body',
+            '"model" must be a string',
+            '"year" was missing in the request body',
+            '"year" must be a number',
+          ],
+        };
+
+        request(app)
+          .put(updateCarPath)
+          .set('Content-Type', 'application/json')
+          .send(emptyBody)
+          .expect(StatusCodes.BAD_REQUEST)
+          .end((err, res) => {
+            if (err) {
+              done(err);
+            } else {
+              expect(res.body).toEqual(expectedValidationErrors);
+              done();
+            }
+          });
+      });
+
+      it('"submodel" should be optional', (done) => {
+        updateCarTaskMock.withExecuteReturning(kiaRioLx2018);
+
+        const updateCarDataWithoutSubmodel: CreateCarData = {
+          ...updateCarData,
+          submodel: undefined,
+        };
+
+        request(app)
+          .put(updateCarPath)
+          .set('Content-Type', 'application/json')
+          .send(updateCarDataWithoutSubmodel)
+          .expect(StatusCodes.OK)
+          .end((err, res) => {
+            if (err) {
+              done(err);
+            } else {
+              const car = <Car>res.body;
+              expect(car).toEqual(kiaRioLx2018);
+              done();
+            }
+          });
+      });
     });
   });
 });

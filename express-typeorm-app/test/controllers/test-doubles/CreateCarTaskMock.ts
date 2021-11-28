@@ -13,7 +13,7 @@ export default class CreateCarTaskMock {
 
   private readonly constructorStub: SinonStub;
 
-  public withExecuteReturing(car: Car): void {
+  public withExecuteReturning(car: Car): void {
     this.instanceStub.execute.returns(Promise.resolve(car));
   }
 
