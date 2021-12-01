@@ -11,6 +11,7 @@ import FindCarTaskMock from './test-doubles/FindCarTaskMock';
 import ListCarsTaskMock from './test-doubles/ListCarsTaskMock';
 import UpdateCarTaskMock from './test-doubles/UpdateCarTaskMock';
 import { UpdateCarData } from '../../src/tasks/cars/UpdateCarTask';
+import DeleteCarTaskMock from './test-doubles/DeleteCarTaskMock';
 
 describe('CarsController tests', () => {
   let sandbox: SinonSandbox;
@@ -373,6 +374,48 @@ describe('CarsController tests', () => {
             }
           });
       });
+    });
+  });
+
+  context('deleteCar --> DELETE /cars/:id', () => {
+    let deleteCarTaskMock: DeleteCarTaskMock;
+
+    const deleteCarPath = `/cars/${kiaRioLx2018.id}`;
+
+    beforeEach(() => {
+      deleteCarTaskMock = new DeleteCarTaskMock(sandbox);
+    });
+
+    it('should delete a car', (done) => {
+      deleteCarTaskMock.withExecuteSucceeding();
+
+      request(app)
+        .delete(deleteCarPath)
+        .expect(StatusCodes.OK)
+        .end((err) => {
+          if (err) {
+            done(err);
+          } else {
+            done();
+          }
+        });
+    });
+
+    it('should return InternalServerError if an unknown error occurs', (done) => {
+      deleteCarTaskMock.withExecuteThrowing(
+        new Error('I have a bad feeling about this')
+      );
+
+      request(app)
+        .delete(deleteCarPath)
+        .expect(StatusCodes.INTERNAL_SERVER_ERROR)
+        .end((err) => {
+          if (err) {
+            done(err);
+          } else {
+            done();
+          }
+        });
     });
   });
 });

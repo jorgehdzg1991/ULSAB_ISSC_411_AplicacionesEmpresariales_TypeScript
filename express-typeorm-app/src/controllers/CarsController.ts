@@ -116,7 +116,7 @@ export default class CarsController extends Controller {
    *    }
    *  ]
    */
-  private static async listCars(req: Request, res: Response): Promise<void> {
+  private static async listCars(_req: Request, res: Response): Promise<void> {
     try {
       const listCarsTask = new ListCarsTask();
 
