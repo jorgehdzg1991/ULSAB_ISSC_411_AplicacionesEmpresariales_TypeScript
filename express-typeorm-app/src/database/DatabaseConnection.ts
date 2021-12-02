@@ -5,12 +5,14 @@ import {
   Repository,
   EntityTarget,
 } from 'typeorm';
-import environmentVariables from '../EnvironmentVariables';
+import EnvironmentVariables from '../EnvironmentVariables';
 
 export default class DatabaseConnection {
   private static connection: Connection;
 
   public static async getConnectedInstance(): Promise<Connection> {
+    const environmentVariables = new EnvironmentVariables();
+
     if (!this.connection) {
       const ext = environmentVariables.nodeEnv === 'development' ? 'ts' : 'js';
       const entitiesDir = path.join(__dirname, `../models/entities/*.${ext}`);

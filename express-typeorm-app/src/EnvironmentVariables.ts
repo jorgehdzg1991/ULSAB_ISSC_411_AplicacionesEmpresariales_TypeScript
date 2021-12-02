@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-class EnvironmentVariables {
+export default class EnvironmentVariables {
   constructor() {
     this.validateEnvironmentVariables();
   }
@@ -66,5 +66,3 @@ class EnvironmentVariables {
     return <string>process.env[EnvironmentVariables.keys.nodeEnv];
   }
 }
-
-export default new EnvironmentVariables();

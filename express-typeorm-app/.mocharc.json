@@ -4,8 +4,7 @@
   ],
   "spec": "test/**/*.spec.ts",
   "require": [
-    "ts-node/register",
-    "dotenv/config"
+    "ts-node/register"
   ],
   "timeout": 3000
 }

@@ -12,8 +12,9 @@
     "coverage": "nyc mocha",
     "lint": "eslint --ext .ts src test",
     "lint:fix": "yarn lint --fix",
+    "type:check": "tsc --noEmit",
     "docs": "yarn clean:docs && apidoc -c ./apidoc.json -i src -o docs",
-    "sanity": "yarn lint && yarn build && yarn docs"
+    "sanity": "yarn lint && yarn type:check && yarn docs"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
