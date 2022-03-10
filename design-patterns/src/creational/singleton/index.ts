@@ -1,4 +1,4 @@
-import SingletonCounter from './singleton';
+import SingletonCounter from './SingletonCounter';
 
 const counter = SingletonCounter.getInstance();
 
