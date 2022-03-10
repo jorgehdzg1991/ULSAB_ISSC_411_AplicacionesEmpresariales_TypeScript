@@ -1,4 +1,5 @@
 export default class SingletonCounter {
+  // eslint-disable-next-line no-use-before-define
   private static instance?: SingletonCounter;
 
   public count: number;

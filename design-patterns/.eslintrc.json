@@ -4,14 +4,18 @@
         "es2021": true
     },
     "extends": [
-        "airbnb-base"
+        "airbnb-base",
+        "prettier",
+        "plugin:prettier/recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": "latest",
+        "ecmaVersion": 2021,
         "sourceType": "module"
     },
     "plugins": [
+        "prettier",
         "@typescript-eslint"
     ],
     "settings": {
@@ -31,6 +35,13 @@
             }
         ],
         "no-console": "off",
-        "no-use-before-define": "off"
+        "prettier/prettier": [
+            "error",
+            {
+                "singleQuote": true,
+                "endOfLine": "auto",
+                "parser": "typescript"
+            }
+        ]
     }
 }

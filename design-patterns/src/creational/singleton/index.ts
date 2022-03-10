@@ -10,6 +10,12 @@ console.log('Count in "counter" is', counter.count);
 
 const shouldBeTheSameCounter = SingletonCounter.getInstance();
 
-console.log('Count in "shouldBeTheSameCounter" is', shouldBeTheSameCounter.count);
+console.log(
+  'Count in "shouldBeTheSameCounter" is',
+  shouldBeTheSameCounter.count
+);
 
-console.log('counter === shouldBeTheSameCounter -->', counter === shouldBeTheSameCounter);
+console.log(
+  'counter === shouldBeTheSameCounter -->',
+  counter === shouldBeTheSameCounter
+);
