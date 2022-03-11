@@ -6,7 +6,6 @@ import Pizza from './products/Pizza';
 import VeggiePizza from './products/VeggiePizza';
 
 export default class GourmetPizzaFactory extends BasePizzaFactory {
-  // eslint-disable-next-line class-methods-use-this
   public createPizza(type: PizzaType): Pizza {
     let pizza: Pizza;
     const toppingFactory = new GourmetToppingFactory();

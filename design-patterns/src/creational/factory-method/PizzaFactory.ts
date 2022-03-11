@@ -5,7 +5,6 @@ import Pizza from './Pizza';
 import VeggiePizza from './VeggiePizza';
 
 export default class PizzaFactory extends BasePizzaFactory {
-  // eslint-disable-next-line class-methods-use-this
   public makePizza(type: PizzaType): Pizza {
     let pizza: Pizza;
 
