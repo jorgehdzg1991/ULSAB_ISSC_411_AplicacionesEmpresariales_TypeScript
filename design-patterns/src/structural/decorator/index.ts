@@ -22,10 +22,8 @@ let decoratedOrchidBouquet = new OrchidBouquet();
 decoratedOrchidBouquet = new FlowerBouquetWithPaperWrapper(
   decoratedOrchidBouquet
 );
-decoratedOrchidBouquet = new FlowerBouquetWithPaperWrapper(
-  decoratedOrchidBouquet
-);
 decoratedOrchidBouquet = new FlowerBouquetWithRibbonBow(decoratedOrchidBouquet);
+decoratedOrchidBouquet = new FlowerBouquetWithGlitter(decoratedOrchidBouquet);
 console.log(
   `${decoratedOrchidBouquet.getDescription()} $ ${decoratedOrchidBouquet.getCost()}`
 );

@@ -1,6 +1,6 @@
-import ICheese from './Cheese';
+import Cheese from './Cheese';
 
-export default class GoatCheese extends ICheese {
+export default class GoatCheese extends Cheese {
   public prepareCheese(): void {
     console.log('Preparing goat cheese.');
   }

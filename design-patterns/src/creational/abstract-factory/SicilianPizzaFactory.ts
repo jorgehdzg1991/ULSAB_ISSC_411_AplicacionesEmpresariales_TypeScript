@@ -3,7 +3,7 @@ import CheesePizza from './products/CheesePizza';
 import PepperoniPizza from './products/PepperoniPizza';
 import Pizza from './products/Pizza';
 import VeggiePizza from './products/VeggiePizza';
-import SicilianTopicFactory from './SicilianTopingFactory';
+import SicilianTopicFactory from './SicilianToppingFactory';
 
 export default class SicilianPizzaFactory extends BasePizzaFactory {
   public createPizza(type: PizzaType): Pizza {

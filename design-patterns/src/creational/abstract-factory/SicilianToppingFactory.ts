@@ -4,7 +4,7 @@ import MozzarellaCheese from './toppings/MozzarellaCheese';
 import Sauce from './toppings/Sauce';
 import TomatoSauce from './toppings/TomatoSauce';
 
-export default class SicilianTopicFactory extends BaseToppingFactory {
+export default class SicilianToppingFactory extends BaseToppingFactory {
   public createCheese(): Cheese {
     return new MozzarellaCheese();
   }
